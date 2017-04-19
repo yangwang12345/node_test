@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" type="text/css" href="/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/main.css">
+    <script src="/js/jquery.js"></script>
+</head>
+<body>
+<div class="container ">
+    <div class="navbar">
+      <div class="navbar-header">
+        <a class="navbar-brand">欢迎来到web前端考试网</a>
+      </div>
+      <nav id="bs-navbar" class="collapse navbar-collapse">
+        <ul class="nav  navbar-nav navbar-right">
+          <li><% if(locals.login){ %>
+                  <span id="user"><%= locals.login %></span>已经登录
+                  <% if(locals.admin==1){ %>
+                      当前用户为管理员
+                  <% } %>
+                   <a href="/logout">退出</a>
+              <% } else{ %>
+                  <a href="/login">请登录</a>
+              <% } %>            
+          </li>
+        </ul>
+      </nav>
+    </div>   
+</div>
+<div class="container" id="test_content">
+<h4>第一题：选择题(2分)</h4>
+<% for(var i=0;i < data.ques.length; i++){  %>
+  <% if(data.ques[i].id==data.resu[i].questionid) {%>
+    <div class="clearfix mb10">
+      <p><%= i+1 %>:<%= data.ques[i]['title'] %></p>
+      <div class="col-sm-12">
+        <input type="radio" value="a" t="<%= data.resu[i].answer %>" name="<%= data.ques[i]['id'] %>"><%= data.ques[i]['a'] %>
+      </div>
+      <div class="col-sm-12">
+        <input type="radio" value="b" t="<%= data.resu[i].answer %>" name="<%= data.ques[i]['id'] %>"><%= data.ques[i]['b'] %>
+      </div>
+      <div class="col-sm-12">
+        <input type="radio" value="c" t="<%= data.resu[i].answer %>" name="<%= data.ques[i]['id'] %>"><%= data.ques[i]['c'] %>
+      </div>
+      <div class="col-sm-12">
+        <input type="radio" value="d" t="<%= data.resu[i].answer %>" name="<%= data.ques[i]['id'] %>"><%= data.ques[i]['d'] %>
+      </div>
+      <p>正确答案是：<span class="text-danger"><%= data.ques[i].answer %></span></p>
+    </div>
+  <% } %>
+<% } %>
+<span>学生<%= data.resu[0].username %>总得分：<span><input type="text" id="score">
+<div class="btn btn-success" name="<%= data.resu[0].username %>" id="score_submit">提交</div>
+</div>
+<script>
+$(function() {
+  $('input').each(function(index, item) {
+    var bool = ($(this).attr('t') == $(this).val());
+    $(this).prop('checked', bool)
+  });
+  $("#score_submit").on('click', function() {
+    var score = Number($("#score").val());
+    if (score == "" && typeof score != 'number') {
+      alert("您的输入错误");
+    } else {
+      var name = $(this).attr('name');
+      $.ajax({
+        url: '/admin/user/score/',
+        type: 'post',
+        dataType: 'json',
+        data: {
+          name:name,
+          value:score
+        },
+        success: function(data) {
+
+        }
+      });
+    }
+  })
+})
+</script>
+</body>
+</html>

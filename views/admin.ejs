@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+    <title>Title</title>
+    <script src="js/jquery.js"></script>
+    <link rel="stylesheet" type="text/css" href="/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/main.css">
+</head>
+<body>
+<div class="container">
+    <h2 class="text-center">管理员登录</h2>
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+        <th>序号</th>
+        <th>用户名</th>
+        <th>密码</th>
+        <th>邮箱</th>
+        <th>管理员</th>
+        <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+      <% for(var i=0; i< data.length;i++) { %>
+      <tr>
+          <td><%= i+1 %></td>
+          <td><%= data[i]['username'] %></td>
+          <td><%= data[i]['psw'] %></td>
+          <td><%= data[i]['email'] %></td>
+          <td>
+             <% if(data[i]['admin']==1){ %>
+                是
+             <% } else { %>
+                否
+             <% } %>
+          </td>
+          <td><a name="<%= data[i]['username']%>" id="del"> 删除</a>
+          </td>
+          </tr>
+      <% } %> 
+      </tbody>
+    </table>	
+
+    <h4>单选题输入</h4>
+    <form id="form">
+        <div class="form-group clearfix">
+          <div class="col-sm-8 mb15">
+              <div class="col-sm-2 text-right">题目：</div>
+              <div class="col-sm-8">
+                <input class="form-control" name="title">
+              </div>
+          </div>
+          <div class="col-sm-8 mb15">
+              <div class="col-sm-2 text-right">A选项：</div>
+              <div class="col-sm-8">
+                <input class="form-control" name="a">
+              </div>
+          </div>
+          <div class="col-sm-8 mb15">
+              <div class="col-sm-2 text-right">B选项：</div>
+              <div class="col-sm-8">
+                <input class="form-control" name="b">
+              </div>
+          </div>
+          <div class="col-sm-8 mb15">
+              <div class="col-sm-2 text-right">C选项：</div>
+              <div class="col-sm-8">
+                <input class="form-control" name="c">
+              </div>
+          </div>
+          <div class="col-sm-8 mb15">
+              <div class="col-sm-2 text-right">D选项：</div>
+              <div class="col-sm-8">
+                <input class="form-control" name="d">
+              </div>
+          </div>
+          <div class="col-sm-8 mb15">
+              <div class="col-sm-2 text-right">答案：</div>
+              <div class="col-sm-4">
+                <select class="form-control" name="answer">
+                  <option value="a">选项A</option>
+                  <option value="b">选项B</option>
+                  <option value="c">选项C</option>
+                  <option value="d">选项D</option>
+                </select>
+              </div>
+          </div>
+        </div>
+        <div class="col-sm-8 text-left">
+          <div class="col-sm-offset-2 btn btn-success" id="submit">提交</div>
+          <div class="btn btn-danger" id="reset">重置</div>
+        </div>
+    </form>
+
+    <div class="col-sm-12" id="username_content">
+    <% for(var i in data.result_name ){ %>
+      <a href="/admin/test/<%= data.result_name[i].username %>.html" name="<%= data.result_name[i].username %>">学生<%= data.result_name[i].username %>考试结果</a><br>
+    <% } %>
+    </div>
+</div>
+<script>
+  $(function(){
+    $("#del,#edit").click(function(e){
+      var username=$(this).attr('name');
+      var name=$(this).attr('id');
+      $.ajax({
+        url: '/admin/user/'+name,
+        type: 'post',
+        data:{
+          username:username
+        },
+        dataType:'json',
+        success: function(data) {
+             window.location.reload();
+        }
+      }); 
+    })
+
+    $("#reset").click(function(){
+       $("#form")[0].reset();
+    })
+
+    $("#submit").click(function(){
+      var f=$('#form').serializeArray(); 
+      var data={};
+      var len=$("#form input").length+$("#form select").length
+      $.each(f,function(index,item){
+        data[item.name]=item.value;
+        data.type="radio"
+      })
+      if(f.length==len){
+        $.ajax({
+          url: '/admin/subject/radio',
+          type: 'post',
+          data: data,
+          dataType:'json',
+          success: function(data) {
+               $("#form")[0].reset();
+          }
+        }); 
+      } else {
+        alert("不能为空")
+      }
+    })
+  })
+</script>
+</body>
+</html>

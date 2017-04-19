@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" type="text/css" href="/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/main.css">
+    <script src="js/jquery.js"></script>
+</head>
+<body>
+<div class="container ">
+    <div class="navbar">
+      <div class="navbar-header">
+        <a class="navbar-brand">欢迎来到web前端考试网</a>
+      </div>
+      <nav id="bs-navbar" class="collapse navbar-collapse">
+        <ul class="nav  navbar-nav navbar-right">
+          <li><% if(locals.login){ %>
+                  <span id="user"><%= locals.login %></span>已经登录
+                  <% if(locals.admin==1){ %>
+                      当前用户为管理员
+                  <% } %>
+                   <a href="/logout">退出</a>
+              <% } else{ %>
+                  <a href="/login">请登录</a>
+              <% } %>            
+          </li>
+        </ul>
+      </nav>
+    </div>   
+</div>
+
+  <div class="container" id="test_content">
+  <% if(data.ret==0){ %>
+  <h4>第一题：选择题(2分)</h4>
+    <% for(var i=0;i< data.length;i++){ %>
+    <div class="clearfix mb10">
+      <p><%= i+1 %>:<%= data[i]['title'] %></p>
+      <div class="col-sm-12">
+        <input type="radio" value="a" name="<%= data[i]['id'] %>"><%= data[i]['a'] %>
+      </div>
+      <div class="col-sm-12">
+        <input type="radio" value="b" name="<%= data[i]['id'] %>"><%= data[i]['b'] %>
+      </div>
+      <div class="col-sm-12">
+        <input type="radio" value="c" name="<%= data[i]['id'] %>"><%= data[i]['c'] %>
+      </div>
+      <div class="col-sm-12">
+        <input type="radio" value="d" name="<%= data[i]['id'] %>"><%= data[i]['d'] %>
+      </div>
+    </div>
+    <% } %>
+  <div class="btn btn-success" id="user_submit">提交</div>
+  <% } else { %>
+  <h4>您的的成绩：<%= data.score %></h4>
+  <% } %>
+  </div>
+<script>
+$("#user_submit").click(function() {
+  var data = {};
+  login = $("#user").text();
+  $.each($("input[type='radio']"), function(index, item) {
+    if ($(this).prop('checked') == true) {
+      data[item.name] = $(this).val()
+    }
+  })
+  $.ajax({
+    url: '/user/' + login,
+    type: 'post',
+    data: data,
+    dataType: 'json',
+    success: function(data) {
+      window.location.reload();
+    }
+  });
+})
+</script>
+</body>
+</html>
