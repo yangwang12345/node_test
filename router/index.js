@@ -1,69 +1,29 @@
-const express = require('express'),
-	router = express.Router(),
-	sql = require('mysql');
-
-var loginid;
-router.get('/', function(req, res) {
-	res.locals.admin = req.session.admin;
-	// 如果用户登录了
-	if (res.locals.login) {
-		mysql.query('select * from result where username=?;', [res.locals.login], function(err, data2) {
-			// 若该用户考试了
-			if (data2.length > 0) {
-				mysql.query('select * from user where username=?;', [res.locals.login], function(err, data4) {
-					if (data4[0].score!=null) {
-						res.render('index.ejs', {
-							data: {
-								ret: 1,
-								score: data4[0].score
-							}
-						});
-					} else {
-						res.render('index.ejs', {
-							data: {
-								ret: 1,
-								score: "请耐心等待您的考试结果！"
-							}
-						});
-					}
-				})
-			} else {
-				mysql.query('select * from question', function(err, data3) {
-					data3.ret = 0;
-					res.render('index.ejs', {
-						data: data3
-					});
-				})
-			}
-		})
-	} else {
-		// 若没有登录可看到考试题目
-		mysql.query('select * from question', function(err, data) {
-			data.ret = 0;
-			res.render('index.ejs', {
-				data: data
-			});
-		})
-	}
-})
-
-router.get('/logout', function(req, res) {
-	res.clearCookie('login');
-	res.redirect('/');
-});
-
-router.post('/user/:user', function(req, res) {
-	var r_da = req.body,
-		user = req.params.user;
-	for (var i in r_da) {
-		var ans = r_da[i];
-		mysql.query('insert into result (username,questionid,answer) values (?,?,?);', [user, i, ans])
-	}
-	res.send({
-		result: "1"
-	})
-})
-
-router.use('/admin', require('./admin'));
-router.use('/login', require('./login'));
-module.exports = router;
+var express = require('express');  
+var router = express.Router();  
+  
+/* GET home page. */  
+router.get('/', function(req, res, next) {  
+  res.render('index', { name: 'Express 路由1' });  
+});  
+  
+/* GET home page. */  
+router.get('/cors', function(req, res, next) {  
+  res.render('test/index', { name: 'Express 路由1' });  
+});  
+  
+/* GET home page. */  
+router.get('/getData', function(req, res, next) {  
+  //设置允许跨域请求  
+  var reqOrigin = req.header("origin");  
+  
+  if(reqOrigin !=undefined && reqOrigin.indexOf("http://localhost:3000") > -1){  
+  //设置允许 http://localhost:3000 这个域响应  
+    res.header("Access-Control-Allow-Origin", "http://localhost:3000");  
+    res.header("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");  
+    res.header("Access-Control-Allow-Headers", "Content-Type,Content-Length, Authorization, Accept,X-Requested-With");  
+  }  
+  res.json(200, {name:"张三1",age:40});  
+  
+});  
+  
+module.exports = router; 
